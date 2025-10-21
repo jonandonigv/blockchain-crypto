@@ -12,6 +12,7 @@ func (bc *Blockchain) AddBlock(data string) {
 	bc.Blocks = append(bc.Blocks, newBlock)
 }
 
+// Creates the genesis block. The first block of a block-chain data structure
 func NewGenesisBlock() *block.Block {
 	return block.NewBlock("Genesis block", []byte{})
 }
