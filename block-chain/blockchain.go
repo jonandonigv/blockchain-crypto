@@ -6,6 +6,7 @@ type Blockchain struct {
 	Blocks []*block.Block
 }
 
+// Adds a new block into the blockchain
 func (bc *Blockchain) AddBlock(data string) {
 	prevBlock := bc.Blocks[len(bc.Blocks)-1]
 	newBlock := block.NewBlock(data, prevBlock.Hash)
@@ -17,6 +18,7 @@ func NewGenesisBlock() *block.Block {
 	return block.NewBlock("Genesis block", []byte{})
 }
 
+// Creates a new block-chain
 func NewBlockchain() *Blockchain {
 	return &Blockchain{[]*block.Block{NewGenesisBlock()}}
 }

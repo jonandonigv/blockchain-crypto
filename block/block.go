@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// Block data structure
 type Block struct {
 	Timestamp     int64
 	Data          []byte
@@ -14,6 +15,7 @@ type Block struct {
 	Hash          []byte
 }
 
+// Creates the hash in the block
 func (b *Block) SetHash() {
 	timestamp := []byte(strconv.FormatInt(b.Timestamp, 10))
 	header := bytes.Join([][]byte{b.PrevBlockHash, b.Data, timestamp}, []byte{})
@@ -22,6 +24,7 @@ func (b *Block) SetHash() {
 	b.Hash = hash[:]
 }
 
+// Creates a new block and returns said block
 func NewBlock(data string, prevBlockHash []byte) *Block {
 	block := &Block{time.Now().Unix(), []byte(data), prevBlockHash, []byte{}}
 	block.SetHash()
