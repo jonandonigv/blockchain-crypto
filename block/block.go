@@ -93,7 +93,7 @@ type Block struct {
 	Nonce         int
 }
 
-// Creates the hash in the block
+// Deprecated. Creates the hash in the block
 func (b *Block) SetHash() {
 	timestamp := []byte(strconv.FormatInt(b.Timestamp, 10))
 	header := bytes.Join([][]byte{b.PrevBlockHash, b.Data, timestamp}, []byte{})
