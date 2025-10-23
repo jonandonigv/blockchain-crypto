@@ -51,6 +51,16 @@ func (pow *ProofOfWork) prepareData(nonce int) []byte {
 	return data
 }
 
+func (pow *ProofOfWork) Validate() bool {
+	var hasInt big.Int
+
+	data := pow.prepareData(pow.block.Nonce)
+	hash := sha256.Sum256(data)
+	hasInt.SetBytes(hash[:])
+	isValid := hasInt.Cmp(pow.target) == -1
+	return isValid
+}
+
 func (pow *ProofOfWork) Run() (int, []byte) {
 	var hashInt big.Int
 	var hash [32]byte
