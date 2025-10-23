@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/binary"
+	"encoding/gob"
 	"fmt"
 	"log"
 	"math"
@@ -100,6 +101,16 @@ func (b *Block) SetHash() {
 	hash := sha256.Sum256(header)
 
 	b.Hash = hash[:]
+}
+
+func DeserializeBlock(d []byte) *Block {
+	var block Block
+	decoder := gob.NewDecoder(bytes.NewReader(d))
+	err := decoder.Decode(&block)
+	if err != nil {
+		log.Panic(err)
+	}
+	return &block
 }
 
 // Creates a new block and returns said block
