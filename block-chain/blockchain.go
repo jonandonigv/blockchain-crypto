@@ -1,6 +1,14 @@
 package blockchain
 
-import "github.com/jonandonigv/blockchain-crypto/block"
+import (
+	"log"
+
+	"github.com/boltdb/bolt"
+	"github.com/jonandonigv/blockchain-crypto/block"
+)
+
+const dbfile = "blockchain.db"
+const blockBucket = "blocks"
 
 type Blockchain struct {
 	Blocks []*block.Block
@@ -20,5 +28,19 @@ func NewGenesisBlock() *block.Block {
 
 // Creates a new block-chain
 func NewBlockchain() *Blockchain {
+	var tip []byte
+	db, err := bolt.Open(dbfile, 0600, nil)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	err = db.Update(func(tx *bolt.Tx) err {
+		b := tx.Bucket([]byte(blockBucket))
+		if b == nil {
+		} else {
+			tip = b.Get([]byte("l"))
+		}
+		return nil
+	})
 	return &Blockchain{[]*block.Block{NewGenesisBlock()}}
 }
