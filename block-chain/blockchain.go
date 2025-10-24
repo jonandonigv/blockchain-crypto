@@ -37,6 +37,9 @@ func NewBlockchain() *Blockchain {
 	err = db.Update(func(tx *bolt.Tx) err {
 		b := tx.Bucket([]byte(blockBucket))
 		if b == nil {
+			genesis := NewGenesisBlock()
+			b, err := tx.CreateBucket([]byte(blockBucket))
+			err = b.Put(genesis.Hash, genesis.Serialize())
 		} else {
 			tip = b.Get([]byte("l"))
 		}
