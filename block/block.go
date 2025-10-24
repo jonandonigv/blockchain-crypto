@@ -13,6 +13,13 @@ import (
 	"time"
 )
 
+const targetBits = 24
+
+var (
+	maxNonce = math.MaxInt64
+)
+
+// Converts int into Hex
 func IntToHex(num int64) []byte {
 	buff := new(bytes.Buffer)
 	err := binary.Write(buff, binary.BigEndian, num)
@@ -21,12 +28,6 @@ func IntToHex(num int64) []byte {
 	}
 	return buff.Bytes()
 }
-
-const targetBits = 24
-
-var (
-	maxNonce = math.MaxInt64
-)
 
 type ProofOfWork struct {
 	block  *Block
