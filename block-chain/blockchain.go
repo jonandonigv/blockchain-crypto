@@ -34,7 +34,7 @@ func NewBlockchain() *Blockchain {
 		log.Panic(err)
 	}
 
-	err = db.Update(func(tx *bolt.Tx) err {
+	err = db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(blockBucket))
 		if b == nil {
 			genesis := NewGenesisBlock()
