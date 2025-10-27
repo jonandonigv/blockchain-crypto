@@ -11,7 +11,8 @@ const dbfile = "blockchain.db"
 const blockBucket = "blocks"
 
 type Blockchain struct {
-	Blocks []*block.Block
+	tip    []byte
+	Blocks []*bolt.DB
 }
 
 // Adds a new block into the blockchain
@@ -30,6 +31,7 @@ func NewGenesisBlock() *block.Block {
 func NewBlockchain() *Blockchain {
 	var tip []byte
 	db, err := bolt.Open(dbfile, 0600, nil)
+
 	if err != nil {
 		log.Panic(err)
 	}
@@ -48,5 +50,8 @@ func NewBlockchain() *Blockchain {
 		}
 		return nil
 	})
-	return &Blockchain{[]*block.Block{NewGenesisBlock()}}
+	bc := Blockchain{tip, db}
+
+	return &bc
+	// return &Blockchain{[]*block.Block{NewGenesisBlock()}}
 }
