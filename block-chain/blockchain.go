@@ -17,6 +17,15 @@ type Blockchain struct {
 
 // Adds a new block into the blockchain
 func (bc *Blockchain) AddBlock(data string) {
+
+	var lastHash []byte
+
+	err := bc.Blocks.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(blockBucket))
+		lastHash = b.Get([]byte("l"))
+		return nil
+	})
+
 	prevBlock := bc.Blocks[len(bc.Blocks)-1]
 	newBlock := block.NewBlock(data, prevBlock.Hash)
 	bc.Blocks = append(bc.Blocks, newBlock)
