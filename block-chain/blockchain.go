@@ -26,9 +26,20 @@ func (bc *Blockchain) AddBlock(data string) {
 		return nil
 	})
 
-	prevBlock := bc.Blocks[len(bc.Blocks)-1]
-	newBlock := block.NewBlock(data, prevBlock.Hash)
-	bc.Blocks = append(bc.Blocks, newBlock)
+	newBlock := block.NewBlock(data, lastHash)
+
+	err = bc.Blocks.Update(func(tx *bolt.Tx) error {
+		// TODO: Rest of the funciton
+		b := tx.Bucket([]byte(blockBucket))
+		err := b.Put(newBlock.Hash, newBlock.Serialize())
+		if err != nil {
+			log.Panic(err)
+		}
+		err = b.Put([]byte("l"), newBlock.Hash)
+		bc.tip = newBlock.Hash
+		return nil
+	})
+
 }
 
 // Creates the genesis block. The first block of a block-chain data structure
