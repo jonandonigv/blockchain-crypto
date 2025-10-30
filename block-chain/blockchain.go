@@ -25,11 +25,13 @@ func (bc *Blockchain) AddBlock(data string) {
 		lastHash = b.Get([]byte("l"))
 		return nil
 	})
+	if err != nil {
+		log.Panic(err)
+	}
 
 	newBlock := block.NewBlock(data, lastHash)
 
 	err = bc.Blocks.Update(func(tx *bolt.Tx) error {
-		// TODO: Rest of the funciton
 		b := tx.Bucket([]byte(blockBucket))
 		err := b.Put(newBlock.Hash, newBlock.Serialize())
 		if err != nil {
