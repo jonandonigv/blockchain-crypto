@@ -12,7 +12,7 @@ const blockBucket = "blocks"
 
 type Blockchain struct {
 	tip    []byte
-	Blocks []*bolt.DB
+	Blocks *bolt.DB
 }
 
 // Adds a new block into the blockchain
@@ -45,6 +45,8 @@ func NewBlockchain() *Blockchain {
 				log.Panic(err)
 			}
 			err = b.Put(genesis.Hash, genesis.Serialize())
+			err = b.Put([]byte("l"), genesis.Hash)
+			tip = genesis.Hash
 		} else {
 			tip = b.Get([]byte("l"))
 		}
