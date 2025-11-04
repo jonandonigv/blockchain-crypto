@@ -2,6 +2,7 @@ package cli
 
 import (
 	"flag"
+	"log"
 	"os"
 
 	blockchain "github.com/jonandonigv/blockchain-crypto/block-chain"
@@ -12,6 +13,8 @@ type CLI struct {
 }
 
 func (cli *CLI) printUsage() {}
+
+func (cli *CLI) printChain() {}
 
 func (cli *CLI) validateArgs() {
 	if len(os.Args) < 2 {
@@ -24,4 +27,35 @@ func (cli *CLI) Run() {
 	cli.validateArgs()
 
 	addBlock := flag.NewFlagSet("addblock", flag.ExitOnError)
+	printChainCmd := flag.NewFlagSet("printchain", flag.ExitOnError)
+
+	addBlockData := addBlock.String("data", "", "Block data")
+
+	switch os.Args[1] {
+	case "addblock":
+		err := addBlock.Parse(os.Args[2:])
+		if err != nil {
+			log.Panic(err)
+		}
+	case "printchain":
+		err := printChainCmd.Parse(os.Args[2:])
+		if err != nil {
+			log.Panic(err)
+		}
+	default:
+		cli.printUsage()
+		os.Exit(1)
+	}
+
+	if addBlock.Parsed() {
+		if *addBlockData == "" {
+			addBlock.Usage()
+			os.Exit(1)
+		}
+		cli.bc.AddBlock(*addBlockData)
+	}
+
+	if printChainCmd.Parsed() {
+		cli.printChain()
+	}
 }
