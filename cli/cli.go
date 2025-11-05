@@ -12,9 +12,13 @@ type CLI struct {
 	bc *blockchain.Blockchain
 }
 
-func (cli *CLI) printUsage() {}
+func (cli *CLI) printUsage() {
+	// TODO
+}
 
-func (cli *CLI) printChain() {}
+func (cli *CLI) printChain() {
+	// TODO
+}
 
 func (cli *CLI) validateArgs() {
 	if len(os.Args) < 2 {
