@@ -2,6 +2,7 @@ package cli
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 
@@ -10,6 +11,11 @@ import (
 
 type CLI struct {
 	bc *blockchain.Blockchain
+}
+
+func (cli *CLI) addblock(data string) {
+	cli.bc.AddBlock(data)
+	fmt.Println("Success!")
 }
 
 func (cli *CLI) printUsage() {
