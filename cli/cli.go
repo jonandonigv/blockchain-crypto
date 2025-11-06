@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 
+	b "github.com/jonandonigv/blockchain-crypto/block"
 	blockchain "github.com/jonandonigv/blockchain-crypto/block-chain"
 )
 
@@ -23,7 +25,18 @@ func (cli *CLI) printUsage() {
 }
 
 func (cli *CLI) printChain() {
-	// TODO
+	bci := cli.bc.Iterator()
+
+	for {
+		block := bci.Next()
+
+		fmt.Printf("Prev. hash: %x\n", block.PrevBlockHash)
+		fmt.Printf("Data: %s\n", block.Data)
+		fmt.Printf("Hash: %x\n", block.Hash)
+		pow := b.NewProofOfWork(block)
+		fmt.Printf("PoW: %s\n", strconv.FormatBool(pow.Validate()))
+		fmt.Println()
+	}
 }
 
 func (cli *CLI) validateArgs() {
