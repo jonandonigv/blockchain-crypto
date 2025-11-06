@@ -12,11 +12,11 @@ import (
 )
 
 type CLI struct {
-	bc *blockchain.Blockchain
+	Bc *blockchain.Blockchain
 }
 
 func (cli *CLI) addblock(data string) {
-	cli.bc.AddBlock(data)
+	cli.Bc.AddBlock(data)
 	fmt.Println("Success!")
 }
 
@@ -25,7 +25,7 @@ func (cli *CLI) printUsage() {
 }
 
 func (cli *CLI) printChain() {
-	bci := cli.bc.Iterator()
+	bci := cli.Bc.Iterator()
 
 	for {
 		block := bci.Next()
@@ -75,7 +75,7 @@ func (cli *CLI) Run() {
 			addBlock.Usage()
 			os.Exit(1)
 		}
-		cli.bc.AddBlock(*addBlockData)
+		cli.Bc.AddBlock(*addBlockData)
 	}
 
 	if printChainCmd.Parsed() {
