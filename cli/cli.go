@@ -2,14 +2,22 @@ package cli
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
+	"strconv"
 
+	b "github.com/jonandonigv/blockchain-crypto/block"
 	blockchain "github.com/jonandonigv/blockchain-crypto/block-chain"
 )
 
 type CLI struct {
-	bc *blockchain.Blockchain
+	Bc *blockchain.Blockchain
+}
+
+func (cli *CLI) addblock(data string) {
+	cli.Bc.AddBlock(data)
+	fmt.Println("Success!")
 }
 
 func (cli *CLI) printUsage() {
@@ -17,7 +25,18 @@ func (cli *CLI) printUsage() {
 }
 
 func (cli *CLI) printChain() {
-	// TODO
+	bci := cli.Bc.Iterator()
+
+	for {
+		block := bci.Next()
+
+		fmt.Printf("Prev. hash: %x\n", block.PrevBlockHash)
+		fmt.Printf("Data: %s\n", block.Data)
+		fmt.Printf("Hash: %x\n", block.Hash)
+		pow := b.NewProofOfWork(block)
+		fmt.Printf("PoW: %s\n", strconv.FormatBool(pow.Validate()))
+		fmt.Println()
+	}
 }
 
 func (cli *CLI) validateArgs() {
@@ -56,7 +75,7 @@ func (cli *CLI) Run() {
 			addBlock.Usage()
 			os.Exit(1)
 		}
-		cli.bc.AddBlock(*addBlockData)
+		cli.Bc.AddBlock(*addBlockData)
 	}
 
 	if printChainCmd.Parsed() {
