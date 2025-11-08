@@ -21,6 +21,10 @@ type TXInput struct {
 
 const subsidy = 10
 
+func (tx *Transaction) SetID() {
+	// TODO: Set id functionality
+}
+
 func NewCoinbaseTX(to, data string) *Transaction {
 	if data == "" {
 		data = fmt.Sprintf("Reward to '%s'", to)
