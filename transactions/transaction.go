@@ -6,13 +6,13 @@ type Transaction struct {
 	Vout []TXOutput
 }
 
+type TXOutput struct {
+	Value        int
+	ScriptPubKey string
+}
+
 type TXInput struct {
 	TxId      []byte
 	Vout      int
 	ScriptSig string
-}
-
-type TXOutput struct {
-	Value        int
-	ScriptPubKey string
 }
