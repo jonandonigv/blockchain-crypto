@@ -11,6 +11,8 @@ import (
 	"math/big"
 	"strconv"
 	"time"
+
+	"github.com/jonandonigv/blockchain-crypto/transactions"
 )
 
 const targetBits = 24
@@ -89,7 +91,7 @@ func (pow *ProofOfWork) Run() (int, []byte) {
 // Block data structure
 type Block struct {
 	Timestamp     int64
-	Data          []byte
+	Transaction   []*transactions.Transaction
 	PrevBlockHash []byte
 	Hash          []byte
 	Nonce         int
