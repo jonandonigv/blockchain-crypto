@@ -2,6 +2,7 @@ package blockchain
 
 import (
 	"log"
+	"os"
 
 	"github.com/boltdb/bolt"
 	"github.com/jonandonigv/blockchain-crypto/block"
@@ -10,6 +11,7 @@ import (
 
 const dbfile = "blockchain.db"
 const blockBucket = "blocks"
+const genesisCoinbaseData = "The times 03/Jan/2009 Chancellor on brink of second bailout for banks"
 
 type Blockchain struct {
 	tip    []byte
@@ -48,6 +50,13 @@ func (bc *Blockchain) AddBlock(data string) {
 // Creates the genesis block. The first block of a block-chain data structure
 func NewGenesisBlock(coinbase *transactions.Transaction) *block.Block {
 	return block.NewBlock([]*transactions.Transaction{coinbase}, []byte{})
+}
+
+func dbExist() bool {
+	if _, err := os.Stat(dbfile); os.IsNotExist(err) {
+		return false
+	}
+	return true
 }
 
 // Creates a new block-chain
