@@ -1,6 +1,12 @@
 package transactions
 
-import "fmt"
+import (
+	"bytes"
+	"crypto/sha256"
+	"encoding/gob"
+	"fmt"
+	"log"
+)
 
 type Transaction struct {
 	ID   []byte
@@ -21,8 +27,25 @@ type TXInput struct {
 
 const subsidy = 10
 
+func (in *TXInput) CanUnlockOutputWith(unlockingData string) bool {
+	return in.ScriptSig == unlockingData
+}
+
+func (out *TXOutput) CanBeUnlockedWith(unlockingData string) bool {
+	return out.ScriptPubKey == unlockingData
+}
+
 func (tx *Transaction) SetID() {
-	// TODO: Set id functionality
+	var encoded bytes.Buffer
+	var hash [32]byte
+
+	enc := gob.NewEncoder(&encoded)
+	err := enc.Encode(tx)
+	if err != nil {
+		log.Panic(err)
+	}
+	hash = sha256.Sum256(encoded.Bytes())
+	tx.ID = hash[:]
 }
 
 func NewCoinbaseTX(to, data string) *Transaction {
