@@ -51,14 +51,14 @@ func NewGenesisBlock(coinbase *transactions.Transaction) *block.Block {
 }
 
 // Creates a new block-chain
-func NewBlockchain() *Blockchain {
+func NewBlockchain(address string) *Blockchain {
 	var tip []byte
 	db, err := bolt.Open(dbfile, 0600, nil)
 
 	if err != nil {
 		log.Panic(err)
 	}
-
+	// TODO: Update the createion of a new blockchain so it uses transactions
 	err = db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(blockBucket))
 		if b == nil {
