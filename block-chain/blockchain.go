@@ -60,7 +60,7 @@ func dbExist() bool {
 	return true
 }
 
-// Creates a new block-chain
+// NewBlockchain creates a new Blockchain with a genesis block
 func NewBlockchain(address string) *Blockchain {
 
 	if dbExist() == false {
@@ -74,25 +74,65 @@ func NewBlockchain(address string) *Blockchain {
 	if err != nil {
 		log.Panic(err)
 	}
-	// TODO: Update the createion of a new blockchain so it uses transactions
+
 	err = db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(blockBucket))
-		if b == nil {
-			genesis := NewGenesisBlock()
-			b, err := tx.CreateBucket([]byte(blockBucket))
-			if err != nil {
-				log.Panic(err)
-			}
-			err = b.Put(genesis.Hash, genesis.Serialize())
-			err = b.Put([]byte("l"), genesis.Hash)
-			tip = genesis.Hash
-		} else {
-			tip = b.Get([]byte("l"))
-		}
+		tip = b.Get([]byte("l"))
+
 		return nil
 	})
+
+	if err != nil {
+		log.Panic(err)
+	}
+
 	bc := Blockchain{tip, db}
 
 	return &bc
-	// return &Blockchain{[]*block.Block{NewGenesisBlock()}}
+}
+
+// CreateBlockchain creates a new blockchain db
+func CreateBlockchain(address string) *Blockchain {
+	if dbExist() {
+		fmt.Println("Blockchain already exist.")
+		os.Exit(1)
+	}
+
+	var tip []byte
+	db, err := bolt.Open(dbfile, 0600, nil)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	err = db.Update(func(tx *bolt.Tx) error {
+		cbtx := transactions.NewCoinbaseTX(address, genesisCoinbaseData)
+		genesis := NewGenesisBlock(cbtx)
+
+		b, err := tx.CreateBucket([]byte(blockBucket))
+		if err != nil {
+			log.Panic(err)
+		}
+
+		err = b.Put(genesis.Hash, genesis.Serialize())
+		if err != nil {
+			log.Panic(err)
+		}
+
+		err = b.Put([]byte("l"), genesis.Hash)
+		if err != nil {
+			log.Panic(err)
+		}
+
+		tip = genesis.Hash
+
+		return nil
+	})
+
+	if err != nil {
+		log.Panic(err)
+	}
+
+	bc := Blockchain{tip, db}
+
+	return &bc
 }
