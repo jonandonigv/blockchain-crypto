@@ -100,7 +100,7 @@ type Block struct {
 // Deprecated. Creates the hash in the block
 func (b *Block) SetHash() {
 	timestamp := []byte(strconv.FormatInt(b.Timestamp, 10))
-	header := bytes.Join([][]byte{b.PrevBlockHash, b.Data, timestamp}, []byte{})
+	header := bytes.Join([][]byte{b.PrevBlockHash, b.Transaction, timestamp}, []byte{})
 	hash := sha256.Sum256(header)
 
 	b.Hash = hash[:]
@@ -129,8 +129,8 @@ func DeserializeBlock(d []byte) *Block {
 }
 
 // Creates a new block and returns said block
-func NewBlock(data string, prevBlockHash []byte) *Block {
-	block := &Block{time.Now().Unix(), []byte(data), prevBlockHash, []byte{}, 0}
+func NewBlock(transactions []*transactions.Transaction, prevBlockHash []byte) *Block {
+	block := &Block{time.Now().Unix(), transactions, prevBlockHash, []byte{}, 0}
 	pow := NewProofOfWork(block)
 	nonce, hash := pow.Run()
 	block.Hash = hash[:]

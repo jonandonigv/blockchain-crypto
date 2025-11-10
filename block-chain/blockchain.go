@@ -5,6 +5,7 @@ import (
 
 	"github.com/boltdb/bolt"
 	"github.com/jonandonigv/blockchain-crypto/block"
+	"github.com/jonandonigv/blockchain-crypto/transactions"
 )
 
 const dbfile = "blockchain.db"
@@ -45,8 +46,8 @@ func (bc *Blockchain) AddBlock(data string) {
 }
 
 // Creates the genesis block. The first block of a block-chain data structure
-func NewGenesisBlock() *block.Block {
-	return block.NewBlock("Genesis block", []byte{})
+func NewGenesisBlock(coinbase *transactions.Transaction) *block.Block {
+	return block.NewBlock([]*transactions.Transaction{coinbase}, []byte{})
 }
 
 // Creates a new block-chain
