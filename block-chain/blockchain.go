@@ -1,6 +1,7 @@
 package blockchain
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -61,6 +62,12 @@ func dbExist() bool {
 
 // Creates a new block-chain
 func NewBlockchain(address string) *Blockchain {
+
+	if dbExist() == false {
+		fmt.Println("No existing blockchain found. Create one first.")
+		os.Exit(1)
+	}
+
 	var tip []byte
 	db, err := bolt.Open(dbfile, 0600, nil)
 
