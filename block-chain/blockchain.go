@@ -19,6 +19,12 @@ type Blockchain struct {
 	Blocks *bolt.DB
 }
 
+func (bc *Blockchain) FindUnspentTransactions(address string) []transactions.Transaction {
+	var unspentTXs []transactions.Transaction
+	// TODO: Add logic here
+	return unspentTXs
+}
+
 // Adds a new block into the blockchain
 func (bc *Blockchain) AddBlock(data string) {
 
@@ -33,6 +39,7 @@ func (bc *Blockchain) AddBlock(data string) {
 		log.Panic(err)
 	}
 
+	// TODO: Change data to transactions
 	newBlock := block.NewBlock(data, lastHash)
 
 	err = bc.Blocks.Update(func(tx *bolt.Tx) error {
