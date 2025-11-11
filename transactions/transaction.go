@@ -4,8 +4,11 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/gob"
+	"encoding/hex"
 	"fmt"
 	"log"
+
+	blockchain "github.com/jonandonigv/blockchain-crypto/block-chain"
 )
 
 type Transaction struct {
@@ -26,6 +29,39 @@ type TXInput struct {
 }
 
 const subsidy = 10
+
+func NewUTXOTransaction(from, to string, amount int, bc *blockchain.Blockchain) *Transaction {
+	var inputs []TXInput
+	var outputs []TXOutput
+
+	acc, validOutputs := bc.FindSpendableOutputs(from, amount)
+
+	if acc < amount {
+		log.Panic("Error: Not enough funds")
+	}
+
+	for txid, outs := range validOutputs {
+		txID, err := hex.DecodeString(txid)
+		if err != nil {
+			log.Panic(err)
+		}
+
+		for _, out := range outs {
+			input := TXInput{txID, out, from}
+			inputs = append(inputs, input)
+		}
+	}
+
+	outputs = append(outputs, TXOutput{amount, to})
+	if acc > amount {
+		outputs = append(outputs, TXOutput{acc - amount, from})
+	}
+
+	tx := Transaction{nil, inputs, outputs}
+	tx.SetID()
+
+	return &tx
+}
 
 func (tx Transaction) IsCoinbase() bool {
 	return len(tx.Vin) == 1 && len(tx.Vin[0].TxId) == 0 && tx.Vin[0].Vout == -1
