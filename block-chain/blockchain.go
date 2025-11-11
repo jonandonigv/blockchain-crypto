@@ -20,6 +20,21 @@ type Blockchain struct {
 	Blocks *bolt.DB
 }
 
+func (bc *Blockchain) FindUTXO(address string) []transactions.TXOutput {
+	var UTXOs []transactions.TXOutput
+	unspentTransactions := bc.FindUnspentTransactions(address)
+
+	for _, tx := range unspentTransactions {
+		for _, out := range tx.Vout {
+			if out.CanBeUnlockedWith(address) {
+				UTXOs = append(UTXOs, out)
+			}
+		}
+	}
+
+	return UTXOs
+}
+
 func (bc *Blockchain) FindUnspentTransactions(address string) []transactions.Transaction {
 	var unspentTXs []transactions.Transaction
 	spentTXOs := make(map[string][]int)
