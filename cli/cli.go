@@ -15,6 +15,20 @@ type CLI struct {
 	Bc *blockchain.Blockchain
 }
 
+func (cli *CLI) getBalance(address string) {
+	bc := blockchain.NewBlockchain(address)
+	defer bc.Blocks.Close()
+
+	balance := 0
+	UTXOs := bc.FindUTXO(address)
+
+	for _, out := range UTXOs {
+		balance += out.Value
+	}
+
+	fmt.Printf("Balance of '%s': %d\n", address, balance)
+}
+
 func (cli *CLI) addblock(data string) {
 	cli.Bc.AddBlock(data)
 	fmt.Println("Success!")
