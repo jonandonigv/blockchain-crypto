@@ -101,7 +101,7 @@ func (bc *Blockchain) FindUnspentTransactions(address string) []transactions.Tra
 }
 
 // Adds a new block into the blockchain
-func (bc *Blockchain) AddBlock(data string) {
+func (bc *Blockchain) AddBlock(transactions []*transactions.Transaction) {
 
 	var lastHash []byte
 
@@ -115,7 +115,7 @@ func (bc *Blockchain) AddBlock(data string) {
 	}
 
 	// TODO: Change data to transactions
-	newBlock := block.NewBlock(data, lastHash)
+	newBlock := block.NewBlock(transactions, lastHash)
 
 	err = bc.Blocks.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(blockBucket))
