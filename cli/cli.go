@@ -15,13 +15,31 @@ type CLI struct {
 	Bc *blockchain.Blockchain
 }
 
+func (cli *CLI) getBalance(address string) {
+	bc := blockchain.NewBlockchain(address)
+	defer bc.Blocks.Close()
+
+	balance := 0
+	UTXOs := bc.FindUTXO(address)
+
+	for _, out := range UTXOs {
+		balance += out.Value
+	}
+
+	fmt.Printf("Balance of '%s': %d\n", address, balance)
+}
+
 func (cli *CLI) addblock(data string) {
 	cli.Bc.AddBlock(data)
 	fmt.Println("Success!")
 }
 
 func (cli *CLI) printUsage() {
-	// TODO
+	fmt.Println("Usage: ")
+	fmt.Println(" getbalance -address ADDRESS - Get balance of ADDRESS")
+	fmt.Println(" createblockchain -address ADDRESS - Create a blockchain and send genesis block reward to ADDRESS ")
+	fmt.Println(" printchain -Print all the blocks of the blockchain")
+	fmt.Println(" send -from FROM -to TO -amount AMOUNT - Send AMOUNT of coins from FROM to TO")
 }
 
 func (cli *CLI) printChain() {
@@ -31,7 +49,6 @@ func (cli *CLI) printChain() {
 		block := bci.Next()
 
 		fmt.Printf("Prev. hash: %x\n", block.PrevBlockHash)
-		fmt.Printf("Data: %s\n", block.Data)
 		fmt.Printf("Hash: %x\n", block.Hash)
 		pow := b.NewProofOfWork(block)
 		fmt.Printf("PoW: %s\n", strconv.FormatBool(pow.Validate()))

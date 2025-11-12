@@ -9,8 +9,9 @@ import (
 	"log"
 	"math"
 	"math/big"
-	"strconv"
 	"time"
+
+	"github.com/jonandonigv/blockchain-crypto/transactions"
 )
 
 const targetBits = 24
@@ -44,13 +45,25 @@ func NewProofOfWork(b *Block) *ProofOfWork {
 func (pow *ProofOfWork) prepareData(nonce int) []byte {
 	data := bytes.Join([][]byte{
 		pow.block.PrevBlockHash,
-		pow.block.Data,
+		pow.block.HashTransactions(),
 		IntToHex(pow.block.Timestamp),
 		IntToHex(int64(targetBits)),
 		IntToHex(int64(nonce)),
 	}, []byte{})
 
 	return data
+}
+
+func (b *Block) HashTransactions() []byte {
+	var txHashes [][]byte
+	var txHash [32]byte
+
+	for _, tx := range b.Transaction {
+		txHashes = append(txHashes, tx.ID)
+	}
+	txHash = sha256.Sum256(bytes.Join(txHashes, []byte{}))
+
+	return txHash[:]
 }
 
 func (pow *ProofOfWork) Validate() bool {
@@ -68,9 +81,10 @@ func (pow *ProofOfWork) Run() (int, []byte) {
 	var hash [32]byte
 	nonce := 0
 
-	fmt.Printf("Mining the block containing \"%s\"\n", pow.block.Data)
+	fmt.Printf("Mining a new block")
 	for nonce < maxNonce {
 		data := pow.prepareData(nonce)
+
 		hash = sha256.Sum256(data)
 		fmt.Printf("\r%x", hash)
 		hashInt.SetBytes(hash[:])
@@ -89,20 +103,20 @@ func (pow *ProofOfWork) Run() (int, []byte) {
 // Block data structure
 type Block struct {
 	Timestamp     int64
-	Data          []byte
+	Transaction   []*transactions.Transaction
 	PrevBlockHash []byte
 	Hash          []byte
 	Nonce         int
 }
 
-// Deprecated. Creates the hash in the block
-func (b *Block) SetHash() {
+// Deprecated: SetHash() is no longer in use
+/* func (b *Block) SetHash() {
 	timestamp := []byte(strconv.FormatInt(b.Timestamp, 10))
-	header := bytes.Join([][]byte{b.PrevBlockHash, b.Data, timestamp}, []byte{})
+	header := bytes.Join([][]byte{b.PrevBlockHash, b.Transaction, timestamp}, []byte{})
 	hash := sha256.Sum256(header)
 
 	b.Hash = hash[:]
-}
+} */
 
 func (b *Block) Serialize() []byte {
 	var result bytes.Buffer
@@ -127,8 +141,8 @@ func DeserializeBlock(d []byte) *Block {
 }
 
 // Creates a new block and returns said block
-func NewBlock(data string, prevBlockHash []byte) *Block {
-	block := &Block{time.Now().Unix(), []byte(data), prevBlockHash, []byte{}, 0}
+func NewBlock(transactions []*transactions.Transaction, prevBlockHash []byte) *Block {
+	block := &Block{time.Now().Unix(), transactions, prevBlockHash, []byte{}, 0}
 	pow := NewProofOfWork(block)
 	nonce, hash := pow.Run()
 	block.Hash = hash[:]
