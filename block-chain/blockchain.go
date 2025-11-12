@@ -8,6 +8,7 @@ import (
 
 	"github.com/boltdb/bolt"
 	"github.com/jonandonigv/blockchain-crypto/block"
+	// TODO: Refactor code so the circle error is fix
 	"github.com/jonandonigv/blockchain-crypto/transactions"
 )
 
@@ -114,7 +115,6 @@ func (bc *Blockchain) AddBlock(transactions []*transactions.Transaction) {
 		log.Panic(err)
 	}
 
-	// TODO: Change data to transactions
 	newBlock := block.NewBlock(transactions, lastHash)
 
 	err = bc.Blocks.Update(func(tx *bolt.Tx) error {
