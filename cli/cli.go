@@ -11,7 +11,6 @@ import (
 )
 
 type CLI struct {
-	Bc *blockchain.Blockchain
 }
 
 func (cli *CLI) createBlockchain(address string) {
@@ -49,7 +48,11 @@ func (cli *CLI) printUsage() {
 }
 
 func (cli *CLI) printChain() {
-	bci := cli.Bc.Iterator()
+
+	bc := blockchain.NewBlockchain("")
+	defer bc.Blocks.Close()
+
+	bci := bc.Iterator()
 
 	for {
 		block := bci.Next()
