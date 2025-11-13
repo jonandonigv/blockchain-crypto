@@ -14,6 +14,12 @@ type CLI struct {
 	Bc *blockchain.Blockchain
 }
 
+func (cli *CLI) createBlockchain(address string) {
+	bc := blockchain.CreateBlockchain(address)
+	bc.Blocks.Close()
+	fmt.Println("Done!")
+}
+
 func (cli *CLI) getBalance(address string) {
 	bc := blockchain.NewBlockchain(address)
 	defer bc.Blocks.Close()
@@ -28,10 +34,11 @@ func (cli *CLI) getBalance(address string) {
 	fmt.Printf("Balance of '%s': %d\n", address, balance)
 }
 
-func (cli *CLI) addblock(data string) {
+// I'm not sure when I stoped using this function
+/* func (cli *CLI) addblock(data string) {
 	cli.Bc.AddBlock(data)
 	fmt.Println("Success!")
-}
+} */
 
 func (cli *CLI) printUsage() {
 	fmt.Println("Usage: ")
@@ -62,17 +69,41 @@ func (cli *CLI) validateArgs() {
 	}
 }
 
+func (cli *CLI) send(from, to string, amount int) {
+	bc := blockchain.NewBlockchain(from)
+	defer bc.Blocks.Close()
+
+	tx := blockchain.NewUTXOTransaction(from, to, amount, bc)
+	bc.AddBlock([]*blockchain.Transaction{tx})
+	fmt.Println("Success!")
+}
+
 func (cli *CLI) Run() {
 	cli.validateArgs()
 
-	addBlock := flag.NewFlagSet("addblock", flag.ExitOnError)
+	getBalancedCMD := flag.NewFlagSet("getbalance", flag.ExitOnError)
+	createBlockchainedCMD := flag.NewFlagSet("createblockchain", flag.ExitOnError)
+	sendCMD := flag.NewFlagSet("send", flag.ExitOnError)
 	printChainCmd := flag.NewFlagSet("printchain", flag.ExitOnError)
 
-	addBlockData := addBlock.String("data", "", "Block data")
+	getBalancedAddress := getBalancedCMD.String("address", "", "The address to get balance for")
+	createBlockchainAddress := createBlockchainedCMD.String("address", "", "The address to send genesis block reward to")
+	sendFrom := sendCMD.String("from", "", "Source wallet address")
+	sendTo := sendCMD.String("to", "", "Destination wallet address")
+	sendAmount := sendCMD.Int("amount", 0, "Amount to send")
+
+	// addBlock := flag.NewFlagSet("addblock", flag.ExitOnError)
+	//
+	// addBlockData := addBlock.String("data", "", "Block data")
 
 	switch os.Args[1] {
-	case "addblock":
-		err := addBlock.Parse(os.Args[2:])
+	case "getbalance":
+		err := getBalancedCMD.Parse(os.Args[2:])
+		if err != nil {
+			log.Panic(err)
+		}
+	case "createblockchain":
+		err := createBlockchainedCMD.Parse(os.Args[2:])
 		if err != nil {
 			log.Panic(err)
 		}
@@ -81,20 +112,42 @@ func (cli *CLI) Run() {
 		if err != nil {
 			log.Panic(err)
 		}
+	case "send":
+		err := sendCMD.Parse(os.Args[2:])
+		if err != nil {
+			log.Panic(err)
+		}
 	default:
 		cli.printUsage()
 		os.Exit(1)
 	}
 
-	if addBlock.Parsed() {
-		if *addBlockData == "" {
-			addBlock.Usage()
+	if getBalancedCMD.Parsed() {
+		if *getBalancedAddress == "" {
+			getBalancedCMD.Usage()
 			os.Exit(1)
 		}
-		cli.Bc.AddBlock(*addBlockData)
+		cli.getBalance(*getBalancedAddress)
+	}
+
+	if createBlockchainedCMD.Parsed() {
+		if *createBlockchainAddress == "" {
+			createBlockchainedCMD.Usage()
+			os.Exit(1)
+		}
+		cli.createBlockchain(*createBlockchainAddress)
 	}
 
 	if printChainCmd.Parsed() {
 		cli.printChain()
 	}
+
+	if sendCMD.Parsed() {
+		if *sendFrom == "" || *sendTo == "" || *sendAmount <= 0 {
+			sendCMD.Usage()
+			os.Exit(1)
+		}
+		cli.send(*sendFrom, *sendTo, *sendAmount)
+	}
+
 }
