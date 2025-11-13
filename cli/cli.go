@@ -7,7 +7,6 @@ import (
 	"os"
 	"strconv"
 
-	b "github.com/jonandonigv/blockchain-crypto/block"
 	blockchain "github.com/jonandonigv/blockchain-crypto/block-chain"
 )
 
@@ -50,7 +49,7 @@ func (cli *CLI) printChain() {
 
 		fmt.Printf("Prev. hash: %x\n", block.PrevBlockHash)
 		fmt.Printf("Hash: %x\n", block.Hash)
-		pow := b.NewProofOfWork(block)
+		pow := blockchain.NewProofOfWork(block)
 		fmt.Printf("PoW: %s\n", strconv.FormatBool(pow.Validate()))
 		fmt.Println()
 	}
