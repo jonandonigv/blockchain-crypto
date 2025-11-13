@@ -1,4 +1,4 @@
-package block
+package blockchain
 
 import (
 	"bytes"
@@ -103,7 +103,7 @@ func (pow *ProofOfWork) Run() (int, []byte) {
 // Block data structure
 type Block struct {
 	Timestamp     int64
-	Transaction   []*transactions.Transaction
+	Transaction   []*Transaction
 	PrevBlockHash []byte
 	Hash          []byte
 	Nonce         int

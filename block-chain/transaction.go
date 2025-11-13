@@ -1,4 +1,4 @@
-package transactions
+package blockchain
 
 import (
 	"bytes"
@@ -7,8 +7,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"log"
-
-	blockchain "github.com/jonandonigv/blockchain-crypto/block-chain"
 )
 
 type Transaction struct {
@@ -30,7 +28,7 @@ type TXInput struct {
 
 const subsidy = 10
 
-func NewUTXOTransaction(from, to string, amount int, bc *blockchain.Blockchain) *Transaction {
+func NewUTXOTransaction(from, to string, amount int, bc *Blockchain) *Transaction {
 	var inputs []TXInput
 	var outputs []TXOutput
 
