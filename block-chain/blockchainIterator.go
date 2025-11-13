@@ -4,7 +4,6 @@ import (
 	"log"
 
 	"github.com/boltdb/bolt"
-	"github.com/jonandonigv/blockchain-crypto/block"
 )
 
 type BLockchainIterator struct {
@@ -17,13 +16,13 @@ func (bc *Blockchain) Iterator() *BLockchainIterator {
 	return bci
 }
 
-func (i *BLockchainIterator) Next() *block.Block {
-	var blck *block.Block
+func (i *BLockchainIterator) Next() *Block {
+	var blck *Block
 
 	err := i.Blocks.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(blockBucket))
 		encodedBlock := b.Get(i.currentHash)
-		blck = block.DeserializeBlock(encodedBlock)
+		blck = DeserializeBlock(encodedBlock)
 		return nil
 	})
 	if err != nil {

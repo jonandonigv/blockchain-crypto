@@ -7,9 +7,7 @@ import (
 	"os"
 
 	"github.com/boltdb/bolt"
-	"github.com/jonandonigv/blockchain-crypto/block"
 	// TODO: Refactor code so the circle error is fix
-	"github.com/jonandonigv/blockchain-crypto/transactions"
 )
 
 const dbfile = "blockchain.db"
@@ -21,8 +19,8 @@ type Blockchain struct {
 	Blocks *bolt.DB
 }
 
-func (bc *Blockchain) FindUTXO(address string) []transactions.TXOutput {
-	var UTXOs []transactions.TXOutput
+func (bc *Blockchain) FindUTXO(address string) []TXOutput {
+	var UTXOs []TXOutput
 	unspentTransactions := bc.FindUnspentTransactions(address)
 
 	for _, tx := range unspentTransactions {
@@ -59,8 +57,8 @@ Work:
 	return accumulated, unspentOutputs
 }
 
-func (bc *Blockchain) FindUnspentTransactions(address string) []transactions.Transaction {
-	var unspentTXs []transactions.Transaction
+func (bc *Blockchain) FindUnspentTransactions(address string) []Transaction {
+	var unspentTXs []Transaction
 	spentTXOs := make(map[string][]int)
 	bci := bc.Iterator()
 
@@ -102,7 +100,7 @@ func (bc *Blockchain) FindUnspentTransactions(address string) []transactions.Tra
 }
 
 // Adds a new block into the blockchain
-func (bc *Blockchain) AddBlock(transactions []*transactions.Transaction) {
+func (bc *Blockchain) AddBlock(transactions []*Transaction) {
 
 	var lastHash []byte
 
@@ -115,7 +113,7 @@ func (bc *Blockchain) AddBlock(transactions []*transactions.Transaction) {
 		log.Panic(err)
 	}
 
-	newBlock := block.NewBlock(transactions, lastHash)
+	newBlock := NewBlock(transactions, lastHash)
 
 	err = bc.Blocks.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(blockBucket))
@@ -131,8 +129,8 @@ func (bc *Blockchain) AddBlock(transactions []*transactions.Transaction) {
 }
 
 // Creates the genesis block. The first block of a block-chain data structure
-func NewGenesisBlock(coinbase *transactions.Transaction) *block.Block {
-	return block.NewBlock([]*transactions.Transaction{coinbase}, []byte{})
+func NewGenesisBlock(coinbase *Transaction) *Block {
+	return NewBlock([]*Transaction{coinbase}, []byte{})
 }
 
 func dbExist() bool {
@@ -187,7 +185,7 @@ func CreateBlockchain(address string) *Blockchain {
 	}
 
 	err = db.Update(func(tx *bolt.Tx) error {
-		cbtx := transactions.NewCoinbaseTX(address, genesisCoinbaseData)
+		cbtx := NewCoinbaseTX(address, genesisCoinbaseData)
 		genesis := NewGenesisBlock(cbtx)
 
 		b, err := tx.CreateBucket([]byte(blockBucket))
