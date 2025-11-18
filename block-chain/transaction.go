@@ -16,17 +16,34 @@ type Transaction struct {
 }
 
 type TXOutput struct {
-	Value        int
-	ScriptPubKey string
+	Value      int
+	PubKeyHash []byte
 }
 
 type TXInput struct {
 	TxId      []byte
 	Vout      int
-	ScriptSig string
+	Signature []byte
+	PubKey    []byte
 }
 
 const subsidy = 10
+
+func (in *TXInput) UsesKey(pubKeyHash []byte) bool {
+	lockingHash := HashPubKey(in.PubKey)
+
+	return bytes.Compare(lockingHash, pubKeyHash) == 0
+}
+
+func (out *TXOutput) Lock(address []byte) {
+	pubKeyhash := Base58Decode(address)
+	pubKeyhash = pubKeyhash[1 : len(pubKeyhash)-1]
+	out.PubKeyHash = pubKeyhash
+}
+
+func (out *TXOutput) IsLockedWithKey(pubKeyHash []byte) bool {
+	return bytes.Compare(out.PubKeyHash, pubKeyHash) == 0
+}
 
 func NewUTXOTransaction(from, to string, amount int, bc *Blockchain) *Transaction {
 	var inputs []TXInput
