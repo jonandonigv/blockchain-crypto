@@ -49,6 +49,13 @@ func NewUTXOTransaction(from, to string, amount int, bc *Blockchain) *Transactio
 	var inputs []TXInput
 	var outputs []TXOutput
 
+	wallets, err := NewWallet()
+	if err != nil {
+		log.Panic(err)
+	}
+
+	wallet := wallets.GetWallet()
+
 	acc, validOutputs := bc.FindSpendableOutputs(from, amount)
 
 	if acc < amount {
