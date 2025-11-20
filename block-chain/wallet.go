@@ -1,6 +1,7 @@
 package blockchain
 
 import (
+	"bytes"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
@@ -19,15 +20,23 @@ type Wallet struct {
 	PublicKey  []byte
 }
 
-type Wallets struct {
-	Wallets map[string]*Wallet
-}
-
 func NewWallet() *Wallet {
 	private, public := newKeyPair()
 	wallet := Wallet{private, public}
 
 	return &wallet
+}
+
+func (w Wallet) GetAddress() []byte {
+	pubKeyHash := HashPubKey(w.PublicKey)
+
+	versionedPayload := append([]byte{version}, pubKeyHash...)
+	checksum := checksum(versionedPayload)
+
+	fullPayload := append(versionedPayload, checksum...)
+	address := Base58Encode(fullPayload)
+
+	return address
 }
 
 func newKeyPair() (ecdsa.PrivateKey, []byte) {
@@ -41,16 +50,14 @@ func newKeyPair() (ecdsa.PrivateKey, []byte) {
 	return *private, pubKey
 }
 
-func (w Wallet) GetAddress() []byte {
-	pubKeyHash := HashPubKey(w.PublicKey)
+func ValidateAddress(address string) bool {
+	pubKeyHash := Base58Decode([]byte(address))
+	actualChecksum := pubKeyHash[len(pubKeyHash)-addressChecksumLen:]
+	version := pubKeyHash[0]
+	pubKeyHash = pubKeyHash[1 : len(pubKeyHash)-addressChecksumLen]
+	targetChecksum := checksum(append([]byte{version}, pubKeyHash...))
 
-	versionedPayload := append([]byte{version}, pubKeyHash...)
-	checksum := checksum(versionedPayload)
-
-	fullPayload := append(versionedPayload, checksum...)
-	address := Base58Encode(fullPayload)
-
-	return address
+	return bytes.Compare(actualChecksum, targetChecksum) == 0
 }
 
 func HashPubKey(pubKey []byte) []byte {
