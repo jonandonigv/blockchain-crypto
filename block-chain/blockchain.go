@@ -37,9 +37,9 @@ func (bc *Blockchain) FindUTXO(pubKeyHash []byte) []TXOutput {
 	return UTXOs
 }
 
-func (bc *Blockchain) FindSpendableOutputs(address string, amount int) (int, map[string][]int) {
+func (bc *Blockchain) FindSpendableOutputs(pubKeyHash []byte, amount int) (int, map[string][]int) {
 	unspentOutputs := make(map[string][]int)
-	unspentTXs := bc.FindUnspentTransactions(address)
+	unspentTXs := bc.FindUnspentTransactions(string(pubKeyHash))
 	accumulated := 0
 
 Work:
@@ -47,7 +47,7 @@ Work:
 		txId := hex.EncodeToString(tx.ID)
 
 		for outIdx, out := range tx.Vout {
-			if out.CanBeUnlockedWith(address) && accumulated < amount {
+			if out.IsLockedWithKey(pubKeyHash) && accumulated < amount {
 				accumulated += out.Value
 				unspentOutputs[txId] = append(unspentOutputs[txId], outIdx)
 
