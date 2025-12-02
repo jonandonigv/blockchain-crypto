@@ -30,24 +30,6 @@ func (cli *CLI) validateArgs() {
 	}
 }
 
-func (cli *CLI) printChain() {
-
-	bc := blockchain.NewBlockchain("")
-	defer bc.Blocks.Close()
-
-	bci := bc.Iterator()
-
-	for {
-		block := bci.Next()
-
-		fmt.Printf("Prev. hash: %x\n", block.PrevBlockHash)
-		fmt.Printf("Hash: %x\n", block.Hash)
-		pow := blockchain.NewProofOfWork(block)
-		fmt.Printf("PoW: %s\n", strconv.FormatBool(pow.Validate()))
-		fmt.Println()
-	}
-}
-
 func (cli *CLI) send(from, to string, amount int) {
 	bc := blockchain.NewBlockchain(from)
 	defer bc.Blocks.Close()
