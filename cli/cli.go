@@ -30,14 +30,14 @@ func (cli *CLI) validateArgs() {
 	}
 }
 
-func (cli *CLI) send(from, to string, amount int) {
+/* func (cli *CLI) send(from, to string, amount int) {
 	bc := blockchain.NewBlockchain(from)
 	defer bc.Blocks.Close()
 
 	tx := blockchain.NewUTXOTransaction(from, to, amount, bc)
 	bc.AddBlock([]*blockchain.Transaction{tx})
 	fmt.Println("Success!")
-}
+} */
 
 func (cli *CLI) Run() {
 	cli.validateArgs()
