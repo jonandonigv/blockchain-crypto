@@ -10,41 +10,24 @@ import (
 	blockchain "github.com/jonandonigv/blockchain-crypto/block-chain"
 )
 
-type CLI struct {
-}
-
-func (cli *CLI) createBlockchain(address string) {
-	bc := blockchain.CreateBlockchain(address)
-	bc.Blocks.Close()
-	fmt.Println("Done!")
-}
-
-func (cli *CLI) getBalance(address string) {
-	bc := blockchain.NewBlockchain(address)
-	defer bc.Blocks.Close()
-
-	balance := 0
-	UTXOs := bc.FindUTXO(address)
-
-	for _, out := range UTXOs {
-		balance += out.Value
-	}
-
-	fmt.Printf("Balance of '%s': %d\n", address, balance)
-}
-
-// I'm not sure when I stoped using this function
-/* func (cli *CLI) addblock(data string) {
-	cli.Bc.AddBlock(data)
-	fmt.Println("Success!")
-} */
+type CLI struct{}
 
 func (cli *CLI) printUsage() {
 	fmt.Println("Usage: ")
+	fmt.Println(" createblockchain -address ADDRESS - Create a blockchain and send genesis block reward to ADDRESS")
+	fmt.Println(" createwallet - Generates a new key-pair and saves it into the wallet file")
 	fmt.Println(" getbalance -address ADDRESS - Get balance of ADDRESS")
-	fmt.Println(" createblockchain -address ADDRESS - Create a blockchain and send genesis block reward to ADDRESS ")
-	fmt.Println(" printchain -Print all the blocks of the blockchain")
-	fmt.Println(" send -from FROM -to TO -amount AMOUNT - Send AMOUNT of coins from FROM to TO")
+	fmt.Println(" listaddresses - List all addresses from the wallet file")
+	fmt.Println(" printchain - Print all the blocks of the blockchain")
+	fmt.Println(" send -from FROM -to TO -amount AMOUNT - Send AMOUNT of coins from FROM address to TO")
+
+}
+
+func (cli *CLI) validateArgs() {
+	if len(os.Args) < 2 {
+		cli.printUsage()
+		os.Exit(1)
+	}
 }
 
 func (cli *CLI) printChain() {
@@ -62,13 +45,6 @@ func (cli *CLI) printChain() {
 		pow := blockchain.NewProofOfWork(block)
 		fmt.Printf("PoW: %s\n", strconv.FormatBool(pow.Validate()))
 		fmt.Println()
-	}
-}
-
-func (cli *CLI) validateArgs() {
-	if len(os.Args) < 2 {
-		cli.printUsage()
-		os.Exit(1)
 	}
 }
 
