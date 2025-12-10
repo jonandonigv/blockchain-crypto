@@ -86,4 +86,33 @@ func (cli *CLI) Run() {
 		}
 		cli.getBalance(*getBalanceAddress)
 	}
+
+	if createBlockchainCmd.Parsed() {
+		if *createBlockchain == "" {
+			createBlockchainCmd.Usage()
+			os.Exit(1)
+		}
+		cli.createBlockchain(*createBlockchain)
+	}
+
+	if createWalletCmd.Parsed() {
+		cli.createWallet()
+	}
+
+	if listAddressesCmd.Parsed() {
+		cli.listAddresses()
+	}
+
+	if printChainCmd.Parsed() {
+		cli.printChain()
+	}
+
+	if sendCmd.Parsed() {
+		if *sendFrom == "" || *sendTo == "" || *sendAmount <= 0 {
+			sendCmd.Usage()
+			os.Exit(1)
+		}
+
+		cli.send(*sendFrom, *sendTo, *sendAmount)
+	}
 }
