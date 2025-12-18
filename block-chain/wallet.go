@@ -16,7 +16,7 @@ const walletFile = "wallet.dat"
 const addressChecksumLen = 4
 
 type Wallet struct {
-	PrivateKey ecdsa.PrivateKey
+	PrivateKey []byte
 	PublicKey  []byte
 }
 
@@ -39,7 +39,7 @@ func (w Wallet) GetAddress() []byte {
 	return address
 }
 
-func newKeyPair() (ecdsa.PrivateKey, []byte) {
+func newKeyPair() ([]byte, []byte) {
 	curve := elliptic.P256()
 	private, err := ecdsa.GenerateKey(curve, rand.Reader)
 	if err != nil {
@@ -47,7 +47,7 @@ func newKeyPair() (ecdsa.PrivateKey, []byte) {
 	}
 	pubKey := append(private.PublicKey.X.Bytes(), private.PublicKey.Y.Bytes()...)
 
-	return *private, pubKey
+	return private.D.Bytes(), pubKey
 }
 
 func ValidateAddress(address string) bool {

@@ -49,7 +49,7 @@ func (tx *Transaction) Hash() []byte {
 	return hash[:]
 }
 
-func (tx *Transaction) Sign(privKey ecdsa.PrivateKey, prevTXs map[string]Transaction) {
+func (tx *Transaction) Sign(privKey []byte, prevTXs map[string]Transaction) {
 	if tx.IsCoinbase() {
 		return
 	}
@@ -69,7 +69,7 @@ func (tx *Transaction) Sign(privKey ecdsa.PrivateKey, prevTXs map[string]Transac
 		txCopy.ID = txCopy.Hash()
 		txCopy.Vin[inID].PubKey = nil
 
-		r, s, err := ecdsa.Sign(rand.Reader, &privKey, txCopy.ID)
+		r, s, err := ecdsa.Sign(rand.Reader, privKey, txCopy.ID)
 		if err != nil {
 			log.Panic(err)
 		}

@@ -241,7 +241,7 @@ func (bc *Blockchain) FindTransaction(ID []byte) (Transaction, error) {
 	return Transaction{}, errors.New("Transacion is not found")
 }
 
-func (bc *Blockchain) SignTransaction(tx *Transaction, privKey ecdsa.PrivateKey) {
+func (bc *Blockchain) SignTransaction(tx *Transaction, privKey []byte) {
 	prevTXs := make(map[string]Transaction)
 
 	for _, vin := range tx.Vin {
