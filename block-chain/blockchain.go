@@ -106,6 +106,7 @@ func (bc *Blockchain) FindUnspentTransactions(pubKeyHash []byte) []Transaction {
 func (bc *Blockchain) AddBlock(transactions []*Transaction) {
 
 	var lastHash []byte
+	var lastHeight int
 
 	err := bc.Blocks.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(blockBucket))
@@ -116,7 +117,7 @@ func (bc *Blockchain) AddBlock(transactions []*Transaction) {
 		log.Panic(err)
 	}
 
-	newBlock := NewBlock(transactions, lastHash)
+	newBlock := NewBlock(transactions, lastHash, lastHeight)
 
 	err = bc.Blocks.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(blockBucket))
@@ -133,7 +134,7 @@ func (bc *Blockchain) AddBlock(transactions []*Transaction) {
 
 // Creates the genesis block. The first block of a block-chain data structure
 func NewGenesisBlock(coinbase *Transaction) *Block {
-	return NewBlock([]*Transaction{coinbase}, []byte{})
+	return NewBlock([]*Transaction{coinbase}, []byte{}, 0)
 }
 
 func dbExist() bool {
