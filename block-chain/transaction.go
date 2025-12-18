@@ -185,7 +185,7 @@ func NewUTXOTransaction(from, to string, amount int, bc *Blockchain) *Transactio
 
 	wallet := wallets.GetWallet(from)
 	pubKeyHash := HashPubKey(wallet.PublicKey)
-	acc, validOutputs := bc.FindSpendableOutputs(string(pubKeyHash), amount)
+	acc, validOutputs := bc.FindSpendableOutputs(pubKeyHash, amount)
 
 	if acc < amount {
 		log.Panic("ERROR: Not enough funds")
