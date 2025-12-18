@@ -50,27 +50,27 @@ func (cli *CLI) Run() {
 			log.Panic(err)
 		}
 	case "createblockchain":
-		err := getBalancedCmd.Parse(os.Args[2:])
+		err := createBlockchainCmd.Parse(os.Args[2:])
 		if err != nil {
 			log.Panic(err)
 		}
 	case "createwallet":
-		err := getBalancedCmd.Parse(os.Args[2:])
+		err := createWalletCmd.Parse(os.Args[2:])
 		if err != nil {
 			log.Panic(err)
 		}
 	case "listaddresses":
-		err := getBalancedCmd.Parse(os.Args[2:])
+		err := listAddressesCmd.Parse(os.Args[2:])
 		if err != nil {
 			log.Panic(err)
 		}
 	case "printchain":
-		err := getBalancedCmd.Parse(os.Args[2:])
+		err := printChainCmd.Parse(os.Args[2:])
 		if err != nil {
 			log.Panic(err)
 		}
 	case "send":
-		err := getBalancedCmd.Parse(os.Args[2:])
+		err := sendCmd.Parse(os.Args[2:])
 		if err != nil {
 			log.Panic(err)
 		}
